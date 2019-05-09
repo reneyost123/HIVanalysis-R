@@ -1,1 +1,1 @@
-# mat400project
+#The correct order of these RMD files is project, first_analysis, second_analysis, and then discussion.
