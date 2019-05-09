@@ -1,0 +1,47 @@
+HIV is an epidemic that has persisted amongst humanity for many years. If not treated properly, it can lead to AIDS and the subsequent destruction of the immune system. Our data set contains numbers from the years 2001 and 2009 pertaining to the prevalence of HIV within various demographics all around the world. Our goal with this project was to obesrve correlations between the different demographics provided and predict AIDS related deaths using the demographics' statistics.  
+
+The data set initially needs some cleaning. The data was rearranged to be in a long format so as to be easier to work with, and some countries and categories lack data or contribute a negligible amount of data, so those columns can be removed, along with columns containing error bounds on the estimations and symbols in certain columns. 
+
+Since some columns are available for what is essentially only African countries, we will also analyze Africa using more parameters.
+
+We'll start with the data set containing more countries:
+
+```{r}
+library(tidyverse)
+data <- read_csv("parsedhiv.csv")
+
+data[11] <- NULL
+data[2] <- NULL
+data[2] <- NULL
+data[6] <- NULL
+data[6] <- NULL
+data <- data[-c(37, 38, 51, 52, 75, 76, 77, 78, 97, 98, 185, 186, 55, 56, 219, 220, 237, 238, 
+                293, 294, 297, 298, 305), ]
+
+data <- data %>% mutate(`women` = as.numeric(str_replace_all(`women`, "[ <]", "")))
+data <- data %>% mutate(`adultsandchildren` = as.numeric(str_replace_all(`adultsandchildren`, "[ <]", "")))
+data <- data %>% mutate(`adults` = as.numeric(str_replace_all(`adults`, "[ <]", "")))
+data <- data %>% mutate(`adultprevalancepercentage` = as.numeric(str_replace_all(`adultprevalancepercentage`, "[ <]", "")))
+data <- data %>% mutate(`AIDSrelateddeaths` = as.numeric(str_replace_all(`AIDSrelateddeaths`, "[ <]", "")))
+data <- data[-c(51,1,2), ]
+```
+
+Next, we'll create another data set for almost entirely African countries, with more columns (these were the only countries with said columns).
+
+```{r}
+moredata <- read.csv("parsedhiv.csv")
+
+moredata[2:3] <- NULL
+moredata <- moredata[-c(1:2,3:4,7:28,31:34,37:40,43:46,49:50,53:62,65:66,69:86,87:92,95:104,107:112,115:118,123:124,125:126,127:150,153:160,163:170,173:190,193:194,197:206,209:214,215:216,217:218,219:236,237:238,241:244,247:254,257:264,267:274,277:282,285:288,291:298,299:300,305), ]
+
+moredata <- moredata %>% mutate(`women` = as.numeric(str_replace_all(`women`, "[ <]", "")))
+moredata <- moredata %>% mutate(`adultsandchildren` = as.numeric(str_replace_all(`adultsandchildren`, "[ <]", "")))
+moredata <- moredata %>% mutate(`adults` = as.numeric(str_replace_all(`adults`, "[ <]", "")))
+moredata <- moredata %>% mutate(`adultprevalancepercentage` = as.numeric(str_replace_all(`adultprevalancepercentage`, "[ <]", "")))
+moredata <- moredata %>% mutate(`AIDSrelateddeaths` = as.numeric(str_replace_all(`AIDSrelateddeaths`, "[ <]", "")))
+moredata <- moredata %>% mutate(`adultincidencepercent` = as.numeric(str_replace_all(`adultincidencepercent`, "[ <]", "")))
+moredata <- moredata %>% mutate(`children` = as.numeric(str_replace_all(`children`, "[ <]", "")))
+moredata <- moredata %>% mutate(`orphans` = as.numeric(str_replace_all(`orphans`, "[ ]", "")))
+```
+
+Now that the data sets have been cleaned up, they will be much easier to work with. 

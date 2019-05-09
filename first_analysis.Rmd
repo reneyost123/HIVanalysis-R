@@ -1,0 +1,57 @@
+First, we'll analyze the data using multiple linear regression. Since the data for each country is concentrated between two points, 2001 and 2009, linear regression should be able to predict accurately. We will do this both using the entire data set and a subset of the data using European countries, as well a subset of North American countries, to observe if certain regions can produce more accurate results.  
+
+We'll begin by splitting the data into various training and test sets for the different regions, and then fitting linear models to those sets:
+
+
+```{r}
+library(rsample)
+data_split <- initial_split(data, prop = 0.7)
+train_data <- training(data_split)
+test_data <- testing(data_split)
+
+eur_subset <- data[c(11:12,23:24,64:65,86:89,96:97,128:129,206:209,236:237,246:249,266:267), ]
+eur_split <- initial_split(eur_subset, prop = 0.7)
+train_eur <- training(eur_split)
+test_eur <- testing(eur_split)
+
+na_subset <- data[c(45:46,56:57,62:63,70:71,102:103,110:113,130:131,186:187,270:271), ]
+na_split <- initial_split(na_subset, prop = 0.7)
+train_na <- training(na_split)
+test_na <- testing(na_split)
+
+fit_lm <- lm(AIDSrelateddeaths ~ women + adultsandchildren, data = train_data)
+summary(fit_lm)
+modelr::mse(fit_lm, test_data)
+
+eur_fit_lm <- lm(AIDSrelateddeaths ~ women + adultsandchildren, data = train_eur)
+summary(eur_fit_lm)
+modelr::mse(eur_fit_lm, test_eur)
+
+na_fit_lm <- lm(AIDSrelateddeaths ~ women  + adultsandchildren, data = train_na)
+summary(na_fit_lm)
+modelr::mse(na_fit_lm, test_na)
+```
+
+Linear regression on the entire data set yielded an extremely high error, which is not surprising since it is a large data set and the columns have some correlation. To go along with this, multiple regression on the subset of European countries yielded a significantly smaller error (relative to the other two), showing that this neighborhood of countries can predict the number of AIDS related deaths within itself much better than the entire world using linear regression. Lastly, the model for North America also yielded a high error. Since these are models with low variance, the high bias is yielding high MSE values.
+
+Now we will do similar computations with the subset of Africa: 
+
+```{r}
+moredata_split <- initial_split(moredata, prop = 0.7)
+train_moredata <- training(moredata_split)
+test_moredata <- testing(moredata_split)
+
+afr_fit_lm <- lm(AIDSrelateddeaths ~ women + adults + orphans + children, data = train_moredata)
+summary(afr_fit_lm)
+modelr::mse(afr_fit_lm, test_moredata)
+
+afr_fit_lm2 <- lm(AIDSrelateddeaths ~ adults, data = train_moredata)
+summary(afr_fit_lm2)
+modelr::mse(afr_fit_lm2, test_moredata)
+
+afr_fit_lm3 <- lm(AIDSrelateddeaths ~ adults + orphans, data = train_moredata)
+summary(afr_fit_lm3)
+modelr::mse(afr_fit_lm3, test_moredata)
+```
+
+Multiple linear regression does not seem to predict the number of AIDS related deaths for the subset of African countries well at all. Orphans seem to have a strong linear relationship with the number of AIDS related deaths, and so do adults.  

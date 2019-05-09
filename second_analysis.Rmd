@@ -1,0 +1,84 @@
+Now we will analyze the data using a GAM model. Ideally, it will improve upon the initial lm() analysis by being more flexible where the linear model could not.   
+
+```{r}
+attach(data)
+library(rsample)
+library(gam)
+
+gam_fit <- gam(AIDSrelateddeaths ~ s(women, 1) + adultsandchildren, data = train_data)
+par(mfrow = c(2, 3))
+plot(gam_fit, se = T, col = "red")
+par(mfrow = c(1, 1))
+
+eur_gam_fit <- gam(AIDSrelateddeaths ~ women + s(adultsandchildren, 3), data = train_eur)
+par(mfrow = c(2, 3))
+plot(eur_gam_fit, se = T, col = "red")
+par(mfrow = c(1, 1))
+
+na_gam_fit <- gam(AIDSrelateddeaths ~ s(women, 5) + s(adultsandchildren, 5), data = train_na)
+par(mfrow = c(2, 3))
+plot(na_gam_fit, se = T, col = "red")
+par(mfrow = c(1, 1))
+```
+Finding the errors for these predictions:
+
+```{r}
+gam_pred <- predict(gam_fit, test_data)
+gam_err <- mean((test_data$AIDSrelateddeaths - gam_pred)^2)
+gam_err
+
+gam_pred2 <- predict(eur_gam_fit, test_eur)
+gam_err2 <- mean((test_eur$AIDSrelateddeaths - gam_pred2)^2)
+gam_err2
+
+gam_pred3 <- predict(na_gam_fit, test_na)
+gam_err3 <- mean((test_na$AIDSrelateddeaths - gam_pred3)^2)
+gam_err3
+```
+
+The errors for the GAM models improve upons each of the corresponding linear models. 
+
+```{r}
+summary(gam_fit)
+summary(eur_gam_fit)
+summary(na_gam_fit)
+```
+For each data set, the number of AIDS related deaths seems to have a linear relationship with its predictors. 
+
+Now we will perform similar operations using the subset of African countries. 
+
+```{r}
+afr_gam_fit <- gam(AIDSrelateddeaths ~ s(children, 2) + adults + s(women, 2) + s(orphans, 4), data = train_moredata)
+par(mfrow = c(2, 3))
+plot(afr_gam_fit, se = T, col = "green")
+par(mfrow = c(1, 1))
+
+afr_gam_fit2 <- gam(AIDSrelateddeaths ~ s(adults, 4), data = train_moredata)
+par(mfrow = c(2, 3))
+plot(afr_gam_fit2, se = T, col = "green")
+par(mfrow = c(1, 1))
+
+afr_gam_fit3 <- gam(AIDSrelateddeaths ~ s(adults, 8) + s(orphans, 6), data = train_moredata)
+par(mfrow = c(2, 3))
+plot(afr_gam_fit3, se = T, col = "green")
+par(mfrow = c(1, 1))
+```
+
+```{r}
+afr_gam_pred <- predict(afr_gam_fit, test_moredata)
+afr_gam_pred <- mean((test_moredata$AIDSrelateddeaths - afr_gam_pred)^2)
+afr_gam_pred
+
+afr_gam_pred2 <- predict(afr_gam_fit2, test_moredata)
+afr_gam_pred2 <- mean((test_moredata$AIDSrelateddeaths - afr_gam_pred2)^2)
+afr_gam_pred2
+
+afr_gam_pred3 <- predict(afr_gam_fit3, test_moredata)
+afr_gam_pred3 <- mean((test_moredata$AIDSrelateddeaths - afr_gam_pred3)^2)
+afr_gam_pred3
+
+summary(afr_gam_fit)
+summary(afr_gam_fit2)
+summary(afr_gam_fit3)
+```
+Once again, each of the errors for the linear models were improved upon significantly. Furthermore, the number of AIDS related deaths still consistently has a linear relationship with its predictors, which makes sense since the prevalence of AIDS was higher in most locations in 2009 than it was in 2001.
